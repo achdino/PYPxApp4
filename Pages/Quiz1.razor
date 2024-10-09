@@ -1,0 +1,97 @@
+﻿@page "/quiz1"
+
+<h1>Quiz 1</h1>
+
+<p id="randomQuestionTB">Random question: @currentQuestion.Item1</p>
+<p>Questions: @numberOfQuestionsInQuiz/15</p>
+
+<!-- Buttons for choices -->
+<button @onclick="() => CheckAnswer(choiceButton1)" class="choice-button">@choiceButton1</button>
+<button @onclick="() => CheckAnswer(choiceButton2)" class="choice-button">@choiceButton2</button>
+<button @onclick="() => CheckAnswer(choiceButton3)" class="choice-button">@choiceButton3</button>
+<button @onclick="() => CheckAnswer(choiceButton4)" class="choice-button">@choiceButton4</button>
+
+@code {
+    private List<Tuple<string, List<string>, string>> questionsWithChoicesAndAnswers;
+    private int currentQuestionIndex;
+    private Random rnd = new Random();
+    private Tuple<string, List<string>, string> currentQuestion;
+
+    public int numberOfQuestionsInQuiz = 0;
+    public int numberOfCorrectAnswers = 0;
+    public int numberOfIncorrectAnswers = 0;
+
+    protected override void OnInitialized()
+    {
+        InitializeQuestions(); // Initialize the questions when the component is created
+        LoadNextQuestion();
+    }
+
+    private void InitializeQuestions()
+    {
+        questionsWithChoicesAndAnswers = new List<Tuple<string, List<string>, string>>
+        {
+            // Add your questions here
+            Tuple.Create("What is a budget, and why is it important to have one?",
+                         new List<string> { "A plan for spending money to help you save.", "A list of groceries.", "A type of bank account.", "A way to spend as much money as possible." },
+                         "A plan for spending money to help you save."),
+            // Add more questions as needed
+        };
+    }
+
+    private void LoadNextQuestion()
+    {
+        // Check if it is the final question
+        if (numberOfQuestionsInQuiz >= 15)
+        {
+            double accuracy = (double)numberOfCorrectAnswers / numberOfQuestionsInQuiz * 100; // Convert to percentage
+            ShowResults(accuracy); // Show results if finished
+            return;
+        }
+
+        // Get a random question and choices
+        currentQuestionIndex = rnd.Next(0, questionsWithChoicesAndAnswers.Count);
+        currentQuestion = questionsWithChoicesAndAnswers[currentQuestionIndex];
+
+        // Set choice button text
+        choiceButton1 = currentQuestion.Item2[0];
+        choiceButton2 = currentQuestion.Item2[1];
+        choiceButton3 = currentQuestion.Item2[2];
+        choiceButton4 = currentQuestion.Item2[3];
+
+        numberOfQuestionsInQuiz++;
+    }
+
+    private void ShowResults(double accuracy)
+    {
+        // Show results in a message box or navigate to another page
+        // For example, you could use navigation:
+        // NavigationManager.NavigateTo("/results?accuracy=" + accuracy);
+        
+    }
+
+    private void CheckAnswer(string selectedAnswer)
+    {
+        var correctAnswer = currentQuestion.Item3;
+
+        if (selectedAnswer == correctAnswer)
+        {
+            numberOfCorrectAnswers++;
+            // Optionally show correct feedback
+        }
+        else
+        {
+            // Optionally show incorrect feedback
+        }
+
+        // Remove the question from the list
+        questionsWithChoicesAndAnswers.RemoveAt(currentQuestionIndex);
+        LoadNextQuestion(); // Load the next question
+    }
+
+    // For choice button texts
+    private string choiceButton1;
+    private string choiceButton2;
+    private string choiceButton3;
+    private string choiceButton4;
+}

@@ -1,0 +1,242 @@
+﻿@page "/quiz2"
+
+<h1>Quiz 2</h1>
+
+<p id="randomQuestionTB">Random question: @currentQuestion.Item1</p>
+<p>Questions: @numberOfQuestionsInQuiz/15</p>
+
+<!-- Buttons for choices -->
+<button @onclick="() => CheckAnswer(choiceButton1)" class="choice-button">@choiceButton1</button>
+<button @onclick="() => CheckAnswer(choiceButton2)" class="choice-button">@choiceButton2</button>
+<button @onclick="() => CheckAnswer(choiceButton3)" class="choice-button">@choiceButton3</button>
+<button @onclick="() => CheckAnswer(choiceButton4)" class="choice-button">@choiceButton4</button>
+
+@code {
+    private List<Tuple<string, List<string>, string>> questionsWithChoicesAndAnswers;
+    private int currentQuestionIndex;
+    private Random rnd = new Random();
+    private Tuple<string, List<string>, string> currentQuestion;
+
+    public int numberOfQuestionsInQuiz = 0;
+    public int numberOfCorrectAnswers = 0;
+    public int numberOfIncorrectAnswers = 0;
+
+    protected override void OnInitialized()
+    {
+        InitializeQuestions(); // Initialize the questions when the component is created
+        LoadNextQuestion();
+    }
+
+    private void InitializeQuestions()
+    {
+        questionsWithChoicesAndAnswers = new List<Tuple<string, List<string>, string>>
+        {
+    Tuple.Create("What does GDP stand for?",
+                 new List<string> { "Gross Domestic Product.", "General Development Plan.", "Global Data Protocol.", "Gross Domestic Price." },
+                 "Gross Domestic Product."),
+    Tuple.Create("What does a recession mean?",
+                 new List<string> { "A period of economic decline when GDP falls for two consecutive quarters.", "A time of high employment.", "Increased consumer spending.", "A rise in stock prices." },
+                 "A period of economic decline when GDP falls for two consecutive quarters."),
+    Tuple.Create("What is inflation?",
+                 new List<string> { "A rise in prices of goods and services over time.", "A decrease in money supply.", "A stable economy.", "A financial crisis." },
+                 "A rise in prices of goods and services over time."),
+    Tuple.Create("What is deflation?",
+                 new List<string> { "A decrease in the general price level of goods and services.", "An increase in demand.", "A rise in wages.", "A type of economic policy." },
+                 "A decrease in the general price level of goods and services."),
+    Tuple.Create("What are tariffs?",
+                 new List<string> { "Taxes imposed on imported goods.", "Financial penalties for exports.", "Subsidies for domestic products.", "Trade agreements between countries." },
+                 "Taxes imposed on imported goods."),
+    Tuple.Create("What is a trade surplus?",
+                 new List<string> { "When a country exports more than it imports.", "When imports exceed exports.", "A balance in trade.", "A deficit in trade." },
+                 "When a country exports more than it imports."),
+    Tuple.Create("What does 'bull market' mean?",
+                 new List<string> { "A period of rising stock prices.", "A time of economic decline.", "A stable market.", "A period of uncertainty." },
+                 "A period of rising stock prices."),
+    Tuple.Create("What does 'bear market' mean?",
+                 new List<string> { "A period of falling stock prices.", "A time of economic growth.", "A stable market.", "A period of high consumer confidence." },
+                 "A period of falling stock prices."),
+    Tuple.Create("What is a budget deficit?",
+                 new List<string> { "When expenses exceed revenue in a government budget.", "When revenue exceeds expenses.", "A balanced budget.", "A surplus in the budget." },
+                 "When expenses exceed revenue in a government budget."),
+    Tuple.Create("What is a financial crisis?",
+                 new List<string> { "A situation in which the value of financial institutions or assets drops rapidly.", "A time of economic stability.", "A rise in investments.", "A surplus of financial resources." },
+                 "A situation in which the value of financial institutions or assets drops rapidly."),
+    Tuple.Create("What does the term 'credit' mean?",
+                 new List<string> { "The ability of a consumer to borrow money or access goods with the understanding that payment will be made later.", "A type of loan.", "Cash reserves of a bank.", "A government grant." },
+                 "The ability of a consumer to borrow money or access goods with the understanding that payment will be made later."),
+    Tuple.Create("What is an interest rate?",
+                 new List<string> { "The percentage charged on borrowed money.", "The fee for opening a bank account.", "The profit made from investments.", "The cost of goods." },
+                 "The percentage charged on borrowed money."),
+    Tuple.Create("What is a stock?",
+                 new List<string> { "A share in the ownership of a company.", "A type of bond.", "A loan taken by a company.", "A bank account." },
+                 "A share in the ownership of a company."),
+    Tuple.Create("What is a bond?",
+                 new List<string> { "A fixed income investment representing a loan made by an investor to a borrower.", "A type of equity.", "A savings account.", "A type of stock." },
+                 "A fixed income investment representing a loan made by an investor to a borrower."),
+    Tuple.Create("What does 'monetary policy' mean?",
+                 new List<string> { "The actions of a central bank to control the money supply and interest rates.", "Government spending strategies.", "Taxation policies.", "Trade agreements." },
+                 "The actions of a central bank to control the money supply and interest rates."),
+    Tuple.Create("What is fiscal policy?",
+                 new List<string> { "Government spending and tax policies used to influence the economy.", "Policies regarding trade.", "Interest rate adjustments.", "Consumer protection laws." },
+                 "Government spending and tax policies used to influence the economy."),
+    Tuple.Create("What does 'consumer confidence' mean?",
+                 new List<string> { "The degree of optimism that consumers feel about the overall state of the economy.", "The level of consumer spending.", "The rate of savings.", "The level of inflation." },
+                 "The degree of optimism that consumers feel about the overall state of the economy."),
+    Tuple.Create("What is unemployment?",
+                 new List<string> { "The state of being jobless while actively seeking work.", "The rate of job openings.", "The total number of employed individuals.", "A type of economic policy." },
+                 "The state of being jobless while actively seeking work."),
+    Tuple.Create("What is a monopoly?",
+                 new List<string> { "A market structure where a single seller controls the entire supply of a product or service.", "A competition among sellers.", "A type of government regulation.", "A measure of inflation." },
+                 "A market structure where a single seller controls the entire supply of a product or service."),
+    Tuple.Create("What is competition?",
+                 new List<string> { "The rivalry among businesses to attract customers and increase sales.", "A form of government intervention.", "A measure of economic growth.", "A type of market structure." },
+                 "The rivalry among businesses to attract customers and increase sales."),
+    Tuple.Create("What does 'import' mean?",
+                 new List<string> { "To bring goods or services into a country from abroad.", "To send goods out of a country.", "To manufacture goods domestically.", "To sell goods online." },
+                 "To bring goods or services into a country from abroad."),
+    Tuple.Create("What does 'export' mean?",
+                 new List<string> { "To send goods or services out of a country for sale.", "To bring goods into a country.", "To buy goods from another country.", "To manufacture products." },
+                 "To send goods or services out of a country for sale."),
+    Tuple.Create("What is a currency?",
+                 new List<string> { "The system of money in use in a particular country.", "A type of investment.", "A bank account.", "A measure of inflation." },
+                 "The system of money in use in a particular country."),
+    Tuple.Create("What is an exchange rate?",
+                 new List<string> { "The value of one currency for the purpose of conversion to another.", "The price of goods in a currency.", "The rate of inflation.", "The interest rate." },
+                 "The value of one currency for the purpose of conversion to another."),
+    Tuple.Create("What does 'balance of payments' mean?",
+                 new List<string> { "A statement that summarizes all economic transactions between residents of a country and the rest of the world.", "A financial report of a company.", "A measure of trade deficits.", "An analysis of currency exchange rates." },
+                 "A statement that summarizes all economic transactions between residents of a country and the rest of the world."),
+    Tuple.Create("What is economic growth?",
+                 new List<string> { "An increase in the production of goods and services in an economy.", "A reduction in unemployment.", "A rise in inflation.", "A balance in trade." },
+                 "An increase in the production of goods and services in an economy."),
+    Tuple.Create("What is a recession indicator?",
+                 new List<string> { "Factors that signal a possible recession, such as rising unemployment and falling investment.", "A measure of economic growth.", "The level of consumer confidence.", "A rise in exports." },
+                 "Factors that signal a possible recession, such as rising unemployment and falling investment."),
+    Tuple.Create("What does 'outsource' mean?",
+                 new List<string> { "To obtain goods or services from an external or foreign supplier.", "To sell goods domestically.", "To hire local workers.", "To increase production." },
+                 "To obtain goods or services from an external or foreign supplier."),
+    Tuple.Create("What does the term 'labor force' refer to?",
+                 new List<string> { "The total number of people employed or actively seeking employment.", "The number of unemployed individuals.", "The total population.", "The number of retired individuals." },
+                 "The total number of people employed or actively seeking employment."),
+    Tuple.Create("What is a fiscal year?",
+                 new List<string> { "A one-year period that governments and companies use for accounting purposes.", "A measure of economic growth.", "A period of inflation.", "A type of tax." },
+                 "A one-year period that governments and companies use for accounting purposes."),
+    Tuple.Create("What is the purpose of the World Bank?",
+                 new List<string> { "To provide financial and technical assistance to developing countries.", "To regulate global trade.", "To invest in stocks.", "To monitor inflation rates." },
+                 "To provide financial and technical assistance to developing countries."),
+    Tuple.Create("What does a currency peg mean?",
+                 new List<string> { "Fixing a country's currency value to that of another currency.", "A measure of inflation.", "The value of exports.", "A type of trade agreement." },
+                 "Fixing a country's currency value to that of another currency."),
+    Tuple.Create("What is a capital market?",
+                 new List<string> { "A financial market for buying and selling equity and debt instruments.", "A market for goods and services.", "A type of trade agreement.", "An international market." },
+                 "A financial market for buying and selling equity and debt instruments."),
+    Tuple.Create("What is a recession?",
+                 new List<string> { "A significant decline in economic activity across the economy.", "A period of economic growth.", "An increase in exports.", "A type of market." },
+                 "A significant decline in economic activity across the economy."),
+    Tuple.Create("What does 'supply and demand' refer to?",
+                 new List<string> { "The relationship between the availability of a product and the desire for that product.", "The rate of inflation.", "A government regulation.", "A type of investment." },
+                 "The relationship between the availability of a product and the desire for that product."),
+    Tuple.Create("What is a commodity?",
+                 new List<string> { "A basic good used in commerce that is interchangeable with other goods of the same type.", "A type of service.", "A measure of economic growth.", "A government subsidy." },
+                 "A basic good used in commerce that is interchangeable with other goods of the same type."),
+    Tuple.Create("What does 'GDP per capita' measure?",
+                 new List<string> { "The economic output per person, calculated as GDP divided by the population.", "The total GDP of a country.", "The total population of a country.", "A measure of inflation." },
+                 "The economic output per person, calculated as GDP divided by the population."),
+    Tuple.Create("What is a subsidy?",
+                 new List<string> { "A financial assistance program by the government to support a particular industry.", "A type of tax.", "A government loan.", "A trade agreement." },
+                 "A financial assistance program by the government to support a particular industry."),
+    Tuple.Create("What is a liquidity crisis?",
+                 new List<string> { "A situation when an entity cannot meet its short-term financial obligations.", "A measure of economic growth.", "A type of financial investment.", "A stable market." },
+                 "A situation when an entity cannot meet its short-term financial obligations."),
+    Tuple.Create("What is the stock market?",
+                 new List<string> { "A collection of markets where stocks are bought and sold.", "A type of trade agreement.", "A government regulation.", "A measure of economic growth." },
+                 "A collection of markets where stocks are bought and sold."),
+    Tuple.Create("What is a portfolio?",
+                 new List<string> { "A collection of financial assets owned by an investor.", "A type of loan.", "A bank account.", "A measure of inflation." },
+                 "A collection of financial assets owned by an investor."),
+    Tuple.Create("What is economic inequality?",
+                 new List<string> { "The disparity in wealth and income within a population.", "A measure of economic growth.", "The level of inflation.", "The rate of consumer spending." },
+                 "The disparity in wealth and income within a population."),
+    Tuple.Create("What does 'debt' refer to?",
+                 new List<string> { "Money that is owed to lenders.", "A type of investment.", "A government grant.", "A bank account." },
+                 "Money that is owed to lenders."),
+    Tuple.Create("What is a minimum wage?",
+                 new List<string> { "The lowest legal hourly pay for workers.", "A measure of inflation.", "A type of salary.", "A government subsidy." },
+                 "The lowest legal hourly pay for workers."),
+    Tuple.Create("What does 'economic sanctions' mean?",
+                 new List<string> { "Penalties imposed by one country on another to restrict trade and official contact.", "A trade agreement.", "A type of tax.", "A financial aid program." },
+                 "Penalties imposed by one country on another to restrict trade and official contact."),
+    Tuple.Create("What is a market economy?",
+                 new List<string> { "An economic system where supply and demand determine the production and pricing of goods.", "A planned economy.", "A type of trade agreement.", "A government-controlled market." },
+                 "An economic system where supply and demand determine the production and pricing of goods."),
+    Tuple.Create("What is a trade agreement?",
+                 new List<string> { "A contract between two or more nations outlining the terms of trade between them.", "A financial aid program.", "A type of subsidy.", "A measure of economic growth." },
+                 "A contract between two or more nations outlining the terms of trade between them."),
+    Tuple.Create("What is protectionism?",
+                 new List<string> { "Economic policy of restricting imports to protect domestic industries.", "A measure of economic growth.", "A trade agreement.", "A type of financial aid." },
+                 "Economic policy of restricting imports to protect domestic industries."),
+    Tuple.Create("What is automation?",
+                 new List<string> { "The use of technology to perform tasks without human intervention.", "A type of economic policy.", "A measure of inflation.", "A type of trade agreement." },
+                 "The use of technology to perform tasks without human intervention."),
+    Tuple.Create("What does 'savings rate' mean?",
+                 new List<string> { "The percentage of income that is saved rather than spent.", "The amount of money spent.", "A type of investment.", "A measure of inflation." },
+                 "The percentage of income that is saved rather than spent.")
+
+        };
+    }
+
+    private void LoadNextQuestion()
+    {
+        // Check if it is the final question
+        if (numberOfQuestionsInQuiz >= 15)
+        {
+            double accuracy = (double)numberOfCorrectAnswers / numberOfQuestionsInQuiz * 100; // Convert to percentage
+            ShowResults(accuracy); // Show results if finished
+            return;
+        }
+
+        // Get a random question and choices
+        currentQuestionIndex = rnd.Next(0, questionsWithChoicesAndAnswers.Count);
+        currentQuestion = questionsWithChoicesAndAnswers[currentQuestionIndex];
+
+        // Set choice button text
+        choiceButton1 = currentQuestion.Item2[0];
+        choiceButton2 = currentQuestion.Item2[1];
+        choiceButton3 = currentQuestion.Item2[2];
+        choiceButton4 = currentQuestion.Item2[3];
+
+        numberOfQuestionsInQuiz++;
+    }
+
+    private void ShowResults(double accuracy)
+    {
+        // Show results in a message box or navigate to another page
+        // For example, you could use navigation:
+        // NavigationManager.NavigateTo("/results?accuracy=" + accuracy);
+    }
+
+    private void CheckAnswer(string selectedAnswer)
+    {
+        var correctAnswer = currentQuestion.Item3;
+
+        if (selectedAnswer == correctAnswer)
+        {
+            numberOfCorrectAnswers++;
+            // Optionally show correct feedback
+        }
+        else
+        {
+            // Optionally show incorrect feedback
+        }
+
+        // Remove the question from the list
+        questionsWithChoicesAndAnswers.RemoveAt(currentQuestionIndex);
+        LoadNextQuestion(); // Load the next question
+    }
+
+    // For choice button texts
+    private string choiceButton1;
+    private string choiceButton2;
+    private string choiceButton3;
+    private string choiceButton4;
+}

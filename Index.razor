@@ -1,0 +1,37 @@
+﻿@page "/"
+
+<h1>Welcome to the PYPx App!</h1>
+
+<p>This is your main menu. Select an option below:</p>
+
+<!-- Add a button for the Quiz Menu -->
+<button @onclick="NavigateToQuizMenu" style="color:white; background-color:#6F89D5;">
+    Go to Quiz Menu
+</button>
+
+<!-- Add a button for Stock Simulator -->
+<button @onclick="NavigateToStockSimulator" style="color:white; background-color:#6F89D5;">
+    Go to Stock Simulator
+</button>
+
+<!-- Example for displaying a label (or text) -->
+<p id="moneyLabel">Money: @money</p>
+
+@code {
+    private int money = 100; // Example value
+
+    // NavigationManager for navigation between components/pages
+    [Inject] private NavigationManager Navigation { get; set; }
+
+    // Navigate to Quiz Menu
+    private void NavigateToQuizMenu()
+    {
+        Navigation.NavigateTo("/quizmenu");
+    }
+
+    // Navigate to Stock Simulator
+    private void NavigateToStockSimulator()
+    {
+        Navigation.NavigateTo("/stocksimulator");
+    }
+}
