@@ -3,16 +3,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My blazor app</title>
+    <title>PYPxApp4</title>
     <base href="/PYPxApp4/" />
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="./css/styles.css" rel="stylesheet" />
-    <script src="./_framework/blazor.webassembly.js"></script>
+    <link rel="stylesheet" href="/PYPxApp4/css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="/PYPxApp4/css/app.css" />
+    <link rel="icon" type="image/png" href="/PYPxApp4/favicon.png" />
+    <link href="/PYPxApp4/PYPxApp4.styles.css" rel="stylesheet" />
+    <script src="/PYPxApp4/_framework/blazor.webassembly.js"></script>
 </head>
 <body>
-    <app>Loading... I think this is all it shows.</app>
-    
-    <!-- This starts the Blazor app -->
-    <script>Blazor.start();</script>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>
